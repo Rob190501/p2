@@ -49,7 +49,10 @@ CREATE TABLE `cliente` (
 
 LOCK TABLES `cliente` WRITE;
 /*!40000 ALTER TABLE `cliente` DISABLE KEYS */;
-INSERT INTO `cliente` VALUES ('liviovona24@gmail.com','admin','admin','livio','vona','2000-03-22',1,'1111222233334444','Via G.Luigi X','12345'),('marco@gmail.com','user','user','marco','rossi','2000-02-23',0,'1111222233334444','Via G.Luigi X','12345');
+-- Inserimento di utenti con password già crittografate utilizzando SHA-256
+INSERT INTO `cliente` VALUES 
+('liviovona24@gmail.com', 'admin', '63A9F0EA7BB98050796B649E85481845C6E99171B430F85A6F7C91C922B6EAB1', 'livio', 'vona', '2000-03-22', 1, '1111222233334444', 'Via G.Luigi X', '12345'),
+('marco@gmail.com', 'user', 'FBD8A325D058E385E256CF91C13E978E9717A0230D6C3E13CB1008F97212A9A4', 'marco', 'rossi', '2000-02-23', 0, '1111222233334444', 'Via G.Luigi X', '12345');
 /*!40000 ALTER TABLE `cliente` ENABLE KEYS */;
 UNLOCK TABLES;
 

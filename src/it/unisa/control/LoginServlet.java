@@ -1,6 +1,8 @@
 package it.unisa.control;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -33,9 +35,13 @@ public class LoginServlet extends HttpServlet {
 
 		     UserBean user = new UserBean();
 		     user.setUsername(request.getParameter("un"));
-		     user.setPassword(request.getParameter("pw"));
-		     user = usDao.doRetrieve(request.getParameter("un"),request.getParameter("pw"));
-			   		    
+		     String rawPassword = request.getParameter("pw");
+		        
+		     // Crittografare la password inviata dall'utente per confrontarla con quella memorizzata
+		     String hashedPassword = hashPassword(rawPassword);
+		     user.setPassword(hashedPassword);
+		        
+		     user = usDao.doRetrieve(request.getParameter("un"), hashedPassword);		    
 		    
 		     String checkout = request.getParameter("checkout");
 		     
@@ -60,4 +66,31 @@ public class LoginServlet extends HttpServlet {
 			System.out.println("Error:" + e.getMessage());
 		}
 		  }
+	
+	private String bytesToHex(byte[] bytes) {
+	    StringBuilder hexString = new StringBuilder(2 * bytes.length);
+	    for (byte b : bytes) {
+	        String hex = Integer.toHexString(0xff & b);
+	        if (hex.length() == 1) {
+	            hexString.append('0');
+	        }
+	        hexString.append(hex);
+	    }
+	    return hexString.toString();
 	}
+
+	private String hashPassword(String password) {
+	    try {
+	        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	        byte[] hashedBytes = digest.digest(password.getBytes());
+	        
+	        // Converti l'hash in una stringa esadecimale
+	        return bytesToHex(hashedBytes).toLowerCase();
+	    } catch (NoSuchAlgorithmException e) {
+	        // Gestire l'eccezione in modo appropriato
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
+
+}

@@ -1,6 +1,8 @@
 package it.unisa.control;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -47,8 +49,12 @@ public class RegistrazioneServlet extends HttpServlet {
 			user.setEmail(email);
 			user.setDataDiNascita(Date.valueOf(dataNascita));
 			user.setUsername(username);
-			user.setPassword(pwd);
-			user.setAmministratore(false);
+			
+			// Crittografare la password utilizzando SHA-256
+	        String hashedPassword = hashPassword(pwd);
+	        user.setPassword(hashedPassword);
+			
+	        user.setAmministratore(false);
 			user.setCap(null);
 			user.setIndirizzo(null);
 			user.setCartaDiCredito(null);
@@ -60,6 +66,32 @@ public class RegistrazioneServlet extends HttpServlet {
 				
 		response.sendRedirect(request.getContextPath() + "/Home.jsp");
 
+	}
+	
+	private String bytesToHex(byte[] bytes) {
+	    StringBuilder hexString = new StringBuilder(2 * bytes.length);
+	    for (byte b : bytes) {
+	        String hex = Integer.toHexString(0xff & b);
+	        if (hex.length() == 1) {
+	            hexString.append('0');
+	        }
+	        hexString.append(hex);
+	    }
+	    return hexString.toString();
+	}
+
+	private String hashPassword(String password) {
+	    try {
+	        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	        byte[] hashedBytes = digest.digest(password.getBytes());
+	        
+	        // Converti l'hash in una stringa esadecimale
+	        return bytesToHex(hashedBytes).toLowerCase();
+	    } catch (NoSuchAlgorithmException e) {
+	        // Gestire l'eccezione in modo appropriato
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 
 }
