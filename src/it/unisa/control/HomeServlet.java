@@ -3,6 +3,8 @@ package it.unisa.control;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,6 +22,14 @@ import it.unisa.model.ProdottoDao;
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private static final Set<String> disallowedPages = new HashSet<>();
+
+    static {
+        disallowedPages.add("META-INF/context.xml");
+        disallowedPages.add("WEB-INF/web.xml");
+        // Aggiungi altre pagine o percorsi da escludere qui
+    }
        
  
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -50,8 +60,12 @@ public class HomeServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
-		RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/" + redirectedPage);
-		dispatcher.forward(request, response);
+		if (redirectedPage != null && !disallowedPages.contains(redirectedPage) && isSafePath(redirectedPage)) {
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/" + redirectedPage);
+            dispatcher.forward(request, response);
+        } else {
+            response.sendRedirect("Home.jsp"); // Pagina di errore o pagina predefinita
+        }
 	}
 
 
@@ -59,5 +73,10 @@ public class HomeServlet extends HttpServlet {
 		
 		doGet(request, response);
 	}
+	
+	private boolean isSafePath(String path) {
+        // Ulteriori controlli per prevenire il path traversal, ad esempio:
+        return !path.contains("..") && !path.startsWith("/") && !path.startsWith("\\") && !path.contains("%");
+    }
 
 }
