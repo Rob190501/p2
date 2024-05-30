@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import it.unisa.model.ProdottoBean;
 import it.unisa.model.ProdottoDao;
 
+
 @WebServlet("/catalogo")
 public class CatalogoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -31,33 +32,33 @@ public class CatalogoServlet extends HttpServlet {
 		try {
 			if(action!=null) {
 				if(action.equalsIgnoreCase("add")) {
-					bean.setNome(request.getParameter("nome"));
-					bean.setDescrizione(request.getParameter("descrizione"));
-					bean.setIva(request.getParameter("iva"));
-					bean.setPrezzo(Double.parseDouble(request.getParameter("prezzo")));
-					bean.setQuantità(Integer.parseInt(request.getParameter("quantit�")));
-					bean.setPiattaforma(request.getParameter("piattaforma"));
-					bean.setGenere(request.getParameter("genere"));
-					bean.setImmagine(request.getParameter("img"));
-					bean.setDataUscita(request.getParameter("dataUscita"));
-					bean.setDescrizioneDettagliata(request.getParameter("descDett"));
+					bean.setNome(CatalogoServlet.sanitize(request.getParameter("nome")));
+				    bean.setDescrizione(CatalogoServlet.sanitize(request.getParameter("descrizione")));
+				    bean.setIva(CatalogoServlet.sanitize(request.getParameter("iva")));
+				    bean.setPrezzo(Double.parseDouble(CatalogoServlet.sanitize(request.getParameter("prezzo"))));
+				    bean.setQuantità(Integer.parseInt(CatalogoServlet.sanitize(request.getParameter("quantità"))));
+				    bean.setPiattaforma(CatalogoServlet.sanitize(request.getParameter("piattaforma")));
+				    bean.setGenere(CatalogoServlet.sanitize(request.getParameter("genere")));
+				    bean.setImmagine(CatalogoServlet.sanitize(request.getParameter("img")));
+				    bean.setDataUscita(CatalogoServlet.sanitize(request.getParameter("dataUscita")));
+				    bean.setDescrizioneDettagliata(CatalogoServlet.sanitize(request.getParameter("descDett")));
 					bean.setInVendita(true);
 					prodDao.doSave(bean);
 				}
 				
 				else if(action.equalsIgnoreCase("modifica")) {
 					
-					bean.setIdProdotto(Integer.parseInt(request.getParameter("id")));
-					bean.setNome(request.getParameter("nome"));
-					bean.setDescrizione(request.getParameter("descrizione"));
-					bean.setIva(request.getParameter("iva"));
-					bean.setPrezzo(Double.parseDouble(request.getParameter("prezzo")));
-					bean.setQuantità(Integer.parseInt(request.getParameter("quantit�")));
-					bean.setPiattaforma(request.getParameter("piattaforma"));
-					bean.setGenere(request.getParameter("genere"));
-					bean.setImmagine(request.getParameter("img"));
-					bean.setDataUscita(request.getParameter("dataUscita"));
-					bean.setDescrizioneDettagliata(request.getParameter("descDett"));
+					bean.setIdProdotto(Integer.parseInt(CatalogoServlet.sanitize(request.getParameter("id"))));
+				    bean.setNome(CatalogoServlet.sanitize(request.getParameter("nome")));
+				    bean.setDescrizione(CatalogoServlet.sanitize(request.getParameter("descrizione")));
+				    bean.setIva(CatalogoServlet.sanitize(request.getParameter("iva")));
+				    bean.setPrezzo(Double.parseDouble(CatalogoServlet.sanitize(request.getParameter("prezzo"))));
+				    bean.setQuantità(Integer.parseInt(CatalogoServlet.sanitize(request.getParameter("quantità"))));
+				    bean.setPiattaforma(CatalogoServlet.sanitize(request.getParameter("piattaforma")));
+				    bean.setGenere(CatalogoServlet.sanitize(request.getParameter("genere")));
+				    bean.setImmagine(CatalogoServlet.sanitize(request.getParameter("img")));
+				    bean.setDataUscita(CatalogoServlet.sanitize(request.getParameter("dataUscita")));
+				    bean.setDescrizioneDettagliata(CatalogoServlet.sanitize(request.getParameter("descDett")));
 					bean.setInVendita(true);
 					prodDao.doUpdate(bean);	
 				}
@@ -88,5 +89,41 @@ public class CatalogoServlet extends HttpServlet {
 			throws ServletException, IOException {
 		doGet(request, response);
 	}
+	
+
+	
+
+	public static String sanitize(String input) {
+        if (input == null) {
+            return null;
+        }
+        StringBuilder sanitized = new StringBuilder();
+        for (char c : input.toCharArray()) {
+            switch (c) {
+                case '<':
+                    sanitized.append("&lt;");
+                    break;
+                case '>':
+                    sanitized.append("&gt;");
+                    break;
+                case '&':
+                    sanitized.append("&amp;");
+                    break;
+                case '"':
+                    sanitized.append("&quot;");
+                    break;
+                case '\'':
+                    sanitized.append("&#x27;");
+                    break;
+                case '/':
+                    sanitized.append("&#x2F;");
+                    break;
+                default:
+                    sanitized.append(c);
+                    break;
+            }
+        }
+        return sanitized.toString();
+    }
 
 }
